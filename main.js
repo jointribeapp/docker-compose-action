@@ -1,6 +1,7 @@
 const core = require("@actions/core");
 const compose = require("docker-compose");
 const utils = require("./utils");
+const exec = require("@actions/exec");
 //const path = require("path");
 
 try {
@@ -52,6 +53,19 @@ try {
             .catch((err) => {
               console.log(err.out);
               console.log(err.err);
+              console.log(err);
+              core.setFailed(`tests failed ${JSON.stringify(err)}`);
+            });
+        }, 100000);
+      } else if (testCommand) {
+        // run the test command on the host machine in bash
+        setTimeout(() => {
+          exec
+            .exec(testCommand)
+            .then(() => {
+              console.log("tests passed");
+            })
+            .catch((err) => {
               console.log(err);
               core.setFailed(`tests failed ${JSON.stringify(err)}`);
             });
