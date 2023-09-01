@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@actions/core": "^1.8.2",
+    "@actions/exec": "^1.1.1",
     "@actions/github": "^4.0.0",
     "docker-compose": "^0.23.5"
   },
