@@ -58,6 +58,9 @@ try {
             });
         }, 100000);
       } else if (testCommand) {
+        // print all files in the current directory
+        utils.printCwdFiles();
+
         // run the test command on the host machine in bash
         setTimeout(() => {
           exec
