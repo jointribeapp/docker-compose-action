@@ -22,3 +22,8 @@ module.exports.parseComposeFiles = (composeFiles) => {
     return true;
   });
 };
+
+module.exports.printCwdFiles = () => {
+  console.log(`cwd: ${process.cwd()}`);
+  console.log(`files: ${fs.readdirSync(process.cwd())}`);
+}

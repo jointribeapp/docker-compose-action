@@ -4,6 +4,7 @@ const utils = require("./utils");
 //const path = require("path");
 
 try {
+  utils.printCwdFiles();
   const composeFiles = utils.parseComposeFiles(
     core.getMultilineInput("compose-file")
   );
