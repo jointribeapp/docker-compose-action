@@ -26,6 +26,9 @@ inputs:
   test-command:
     description: "The command to use to execute tests."
     required: false
+  test-directory:
+    description: "The working directory to use when executing tests."
+    required: false
 runs:
   using: "node16"
   main: "main.js"
