@@ -34,17 +34,14 @@ try {
 
       const testContainer = core.getInput("test-container");
       const testCommand = core.getInput("test-command");
-      const testDirectory = core.getInput("test-directory");
 
       console.log("testContainer", testContainer);
       console.log("testCommand", testCommand);
-      console.log("testDirectory", testDirectory);
 
       if (testCommand && testContainer) {
         setTimeout(() => {
           const test = compose.exec(testContainer, testCommand, {
             config: composeFiles,
-            cwd: testDirectory,
           });
 
           test
@@ -55,9 +52,10 @@ try {
             .catch((err) => {
               console.log(err.out);
               console.log(err.err);
+              console.log(err);
               core.setFailed(`tests failed ${JSON.stringify(err)}`);
             });
-        }, 10000);
+        }, 100000);
       }
     })
     .catch((err) => {
