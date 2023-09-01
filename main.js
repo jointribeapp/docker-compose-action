@@ -1,8 +1,6 @@
 const core = require("@actions/core");
 const compose = require("docker-compose");
 const utils = require("./utils");
-const exec = require("@actions/exec");
-//const path = require("path");
 
 try {
   utils.printCwdFiles();
@@ -27,12 +25,41 @@ try {
       ? compose.upMany(services, options)
       : compose.upAll(options);
 
+  // wait for max 2 minutes for all services to be healthy using their healthchecks
+  const timeout = 120000;
+  const interval = 1000;
+  const start = Date.now();
+  const end = start + timeout;
+  const healthcheck = async () => {
+    console.log('checking health');
+    const health = await compose.ps({
+      config: composeFiles,
+    });
+    const healthy = health.out.every((service) => {
+      return service.state === "healthy";
+    });
+    if (healthy) {
+      console.log("all services healthy");
+      return;
+    }
+    if (Date.now() < end) {
+      setTimeout(healthcheck, interval);
+    } else {
+      console.log("timeout waiting for services to be healthy");
+      process.exit(1);
+    }
+  };
+
   promise
-    .then(() => {
+    .then(async () => {
       console.log("compose started");
 
-      // Run tests command.
+      // wait for all services to be healthy
+      console.log('waiting for services to be healthy');
+      await healthcheck();
+      console.log('services are healthy');
 
+      // Run tests command.
       const testContainer = core.getInput("test-container");
       const testCommand = core.getInput("test-command");
 
@@ -53,22 +80,6 @@ try {
             .catch((err) => {
               console.log(err.out);
               console.log(err.err);
-              console.log(err);
-              core.setFailed(`tests failed ${JSON.stringify(err)}`);
-            });
-        }, 100000);
-      } else if (testCommand) {
-        // print all files in the current directory
-        utils.printCwdFiles();
-
-        // run the test command on the host machine in bash
-        setTimeout(() => {
-          exec
-            .exec(testCommand)
-            .then(() => {
-              console.log("tests passed");
-            })
-            .catch((err) => {
               console.log(err);
               core.setFailed(`tests failed ${JSON.stringify(err)}`);
             });
